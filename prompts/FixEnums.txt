@@ -1,0 +1,54 @@
+You didn't do a complete job with the enums.   In the cpp file, in the anonymous namespace above the definition of the conversion functions, you need to add a static assert that verifies that every single member of both enums has the same value.  You did this for AnnoScope, NavigateDirection, and ProviderOptions, but none of the others.  
+
+The attached file enums.cpp is the cpp file where the conversion functions are defined, and to which you need to add the additional asserts.  The attached file enums.h contains the new scoped enums that you generated.  The attached file uiautomationcore_processed_truncated.h contains the definitions of the unscoped enums.  Add the appropriate static_asserts to the anonymous namespaces above the conversion functions in enums.cpp.
+
+--------------------------------------------
+
+For every enum below, generate, in the Uiaw namespace, a modern, scoped enum ("enum class") whose members have the same numerical values.  Also generate functions to convert between the scoped and unscoped enums.  Above the function definitions, inside an anonymous namespace, static_assert that the members of both enums have the same values and that the underlying type of the enums are the same.  Here is an example:
+
+For,
+enum OrientationType
+    {
+        OrientationType_None	= 0,
+        OrientationType_Horizontal	= 1,
+        OrientationType_Vertical	= 2
+    } ;
+
+You should generate (inside namespace Uiaw):
+enum class OrientationType {
+	None = 0,
+	Horizontal = 1,
+	Vertical = 2,
+};
+
+You should generate (also inside namespace Uiaw):
+//
+// enum OrientationType
+//
+namespace
+{
+using UiaUnder = std::underlying_type_t<::OrientationType>;
+using UiawUnder = std::underlying_type_t<Uiaw::OrientationType>;
+static_assert(std::is_same_v<UiaUnder, UiawUnder>);
+static_assert(static_cast<UiawUnder>(::OrientationType::OrientationType_None) == static_cast<UiawUnder>(Uiaw::OrientationType::None));
+static_assert(static_cast<UiawUnder>(::OrientationType::OrientationType_Horizontal) == static_cast<UiawUnder>(Uiaw::OrientationType::Horizontal));
+static_assert(static_cast<UiawUnder>(::OrientationType::OrientationType_Vertical) == static_cast<UiawUnder>(Uiaw::OrientationType::Vertical));
+}
+
+::OrientationType ToUia(Uiaw::OrientationType orientation) {
+	return static_cast<::OrientationType>(orientation);
+}
+
+Uiaw::OrientationType ToUiaw(OrientationType orientation) {
+	return static_cast<Uiaw::OrientationType>(orientation);
+}
+
+Here are the enums:
+
+
+
+
+
+
+
+

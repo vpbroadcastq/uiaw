@@ -1,0 +1,24 @@
+For the following typedefs, generate, in the Uiaw namespace,
+
+1)  A more modern using declaration where only the first letter of each word or acronym is capitalized.  For example, for
+typedef int PROPERTYID;
+generate:
+using PropertyId = int;
+
+2)  In a seperate block of code, for all the typedefs in step (1), static_assert that the underlying types are the same.  For example, for the PROPERTYID example from (1), you would generate:
+static_assert(std::is_same_v<Uiaw::PropertyId, ::PROPERTYID>);
+
+Here are all the typedefs:
+
+typedef int PROPERTYID;
+typedef int PATTERNID;
+typedef int EVENTID;
+typedef int TEXTATTRIBUTEID;
+typedef int CONTROLTYPEID;
+typedef int LANDMARKTYPEID;
+typedef int METADATAID;
+typedef int HEADINGLEVELID;
+
+
+
+

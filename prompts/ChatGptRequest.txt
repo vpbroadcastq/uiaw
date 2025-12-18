@@ -1,0 +1,159 @@
+The attached file is part of a Windows UIAutomation (UIA) header.  I am attempting to develop a modern C++ library that wraps UIA, so that it can be used without having to rely directly on dated Win32 types, constructs, and idioms, like HRESULTS, out parameters, unscoped enums, and Win32 typedefs like DWORD or LPCWSTR.  My library will allow people to develop for UIA without ever having to expose any of their code to any Windows header.  I need you to help me generate this wrapper.
+
+All the code for my library will live in a namespace called Uiaw.  You will be generating me two files, a header named uiaw.h and a cpp file named uiaw.cpp.  Pay attention to the formatting in my examples!  For namespaces, functions, classes, the opening { does NOT go on its own line.  Namespaces are NOT indented.  DO NOT implement functions on a single line.
+
+1)  We need to replace HRESULT error reporting with a custom ErrorCode type defined thus (inside namespace Uiaw):
+struct ErrorCode {
+	int32_t value {};
+};
+
+2)  We need to define a result class that combines an arbitrary value with an error code (inside namespace Uiaw):
+template <typename T>
+struct Result {
+	T value {};
+	ErrorCode error {};
+};
+
+3)  For every enum in the windows header, generate a modern, scoped enum ("enum class") whose members have the same numerical values.  Also generate functions to convert between the scoped and unscoped enums.  Above the function definitions, inside an anonymous namespace, static_assert that the members of both enums have the same values and that the underlying type of the enums are the same.  Some enums have operators defined for them, ex,
+inline constexpr SynchronizedInputType operator | (SynchronizedInputType a, SynchronizedInputType b) noexcept
+You may just ignore these operators.  Here is an example:
+
+For,
+enum OrientationType
+    {
+        OrientationType_None	= 0,
+        OrientationType_Horizontal	= 1,
+        OrientationType_Vertical	= 2
+    } ;
+
+In uiaw.h, you should generate (inside namespace Uiaw):
+enum class OrientationType {
+	None = 0,
+	Horizontal = 1,
+	Vertical = 2,
+};
+
+In uiaw.cpp, you should generate (inside namespace Uiaw):
+//
+// enum OrientationType
+//
+namespace
+{
+using UiaUnder = std::underlying_type_t<::OrientationType>;
+using UiawUnder = std::underlying_type_t<Uiaw::OrientationType>;
+static_assert(std::is_same_v<UiaUnder, UiawUnder>);
+static_assert(static_cast<UiawUnder>(::OrientationType::OrientationType_None) == static_cast<UiawUnder>(Uiaw::OrientationType::None));
+static_assert(static_cast<UiawUnder>(::OrientationType::OrientationType_Horizontal) == static_cast<UiawUnder>(Uiaw::OrientationType::Horizontal));
+static_assert(static_cast<UiawUnder>(::OrientationType::OrientationType_Vertical) == static_cast<UiawUnder>(Uiaw::OrientationType::Vertical));
+}
+
+::OrientationType ToUia(Uiaw::OrientationType orientation) {
+	return static_cast<::OrientationType>(orientation);
+}
+
+Uiaw::OrientationType ToUiaw(OrientationType orientation) {
+	return static_cast<Uiaw::OrientationType>(orientation);
+}
+
+
+4)  Interfaces (ie, structs with virtual methods), are going to be wrapped in value-semantic classes that control the lifetime of the UIAutomation interface object internally.  For interfaces, create a similarly named class with similarly named methods and a single void* member named p_.  This is a type-erased pointer to the interface object, and the method implementations will cast it to the uia type and delegate to the methods on that interface.  The constructor should be private and take a single void* argument (this will be the type-erased usa interface object owned by the wrapper); the remainer of the special member functions should be public.  The wrapper should modernize the wrapped interface methods by replacing out parameters with return-on-the-left, and replace HRESULTS with a Uiaw::ErrorCode type.  Use the Uiaw::Result template defined above in these instructions.  None of the methods should specify a calling convention.  Here is an example,
+
+struct __declspec(uuid("d6dd68d1-86fd-4332-8666-9abedea2d24c")) __declspec(novtable)
+IRawElementProviderSimple : public IUnknown
+{
+public:
+    virtual  HRESULT __stdcall get_ProviderOptions( 
+           enum ProviderOptions *pRetVal) = 0;
+
+    virtual HRESULT __stdcall GetPatternProvider( 
+         PATTERNID patternId,
+           IUnknown **pRetVal) = 0;
+
+    virtual HRESULT __stdcall GetPropertyValue( 
+         PROPERTYID propertyId,
+           VARIANT *pRetVal) = 0;
+
+    virtual  HRESULT __stdcall get_HostRawElementProvider( 
+           IRawElementProviderSimple **pRetVal) = 0;
+};
+
+In uiaw.h, you should generate (inside namespace Uiaw):
+//
+//  RawElementProviderSimple
+//
+class RawElementProviderSimple {
+	void* p_ {}; // Pointer to owned IRawElementProviderSimple
+	explicit RawElementProviderSimple(void*);
+public:
+	RawElementProviderSimple(const RawElementProviderSimple&);
+	RawElementProviderSimple(RawElementProviderSimple&&);
+	RawElementProviderSimple& operator=(const RawElementProviderSimple&);
+	RawElementProviderSimple& operator=(RawElementProviderSimple&&);
+	~RawElementProviderSimple();
+
+	Uiaw::Result<Uiaw::ProviderOptions> GetProviderOptions();
+	Uiaw::Result<IUnknown*> GetPatternProvider(Uiaw::PatternId);
+	Uiaw::Result<VARIANT> GetPropertyId(Uiaw::PropertyId);
+	Uiaw::Result<Uiaw::RawElementProviderSimple> GetHostRawElementProvider();
+};
+Notice that for GetHostRawElementProvider we're returning an instrance of our wrapper, RawElementProviderSimple, by value, rather than an ::IRawElementProviderSimple*, which is what get_HostRawElementProvider is going to produce internally.
+
+In uiaw.cpp, you should generate (inside namespace Uiaw):
+//
+//  RawElementProviderSimple
+//
+RawElementProviderSimple::RawElementProviderSimple(void* provider) {
+	p_ = provider;
+}
+
+RawElementProviderSimple::RawElementProviderSimple(const RawElementProviderSimple& rhs) {
+	p_ = rhs.p_;
+	reinterpret_cast<::IRawElementProviderSimple*>(p_)->AddRef();
+}
+
+RawElementProviderSimple::RawElementProviderSimple(RawElementProviderSimple&& rhs) {
+	p_ = rhs.p_;
+	rhs.p_ = nullptr;
+}
+
+RawElementProviderSimple& RawElementProviderSimple::operator=(RawElementProviderSimple& rhs) {
+	p_ = rhs.p_;
+	reinterpret_cast<::IRawElementProviderSimple*>(p_)->AddRef();
+}
+
+RawElementProviderSimple& RawElementProviderSimple::operator=(const RawElementProviderSimple&& rhs) {
+	p_ = rhs.p_;
+	rhs.p_ = nullptr;
+}
+
+RawElementProviderSimple::~RawElementProviderSimple() {
+	if (p_) {
+		reinterpret_cast<::IRawElementProviderSimple*>(p_)->Release();
+	}
+}
+
+Uiaw::Result<Uiaw::ProviderOptions> RawElementProviderSimple::GetProviderOptions() {
+	::ProviderOptions result {};
+	HRESULT hr = reinterpret_cast<::IRawElementProviderSimple*>(p_)->get_ProviderOptions(&result);
+	return {.value=result, .error=ErrorCode {static_cast<int32_t>(hr)}};
+}
+
+And similarly for the other methods.
+
+5)  There are a bunch of other types of things in the file.  POD structs (ie, structs with no methods), typedefs, constants, etc.  Just ignore these.  The wrapper you produce may not compile if it winds up needing some of these types or values, but that's ok.  I will fix it up myself later.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
