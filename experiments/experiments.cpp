@@ -1,5 +1,5 @@
-#include "uiaw.h"
-#include "uia_all.h"
+#include <uiaw/uiaw.h>
+#include <uiaw/uia_all.h>
 
 
 #include <type_traits>
@@ -50,11 +50,13 @@ RawElementProviderSimple::RawElementProviderSimple(RawElementProviderSimple && r
 RawElementProviderSimple& RawElementProviderSimple::operator=(const RawElementProviderSimple& rhs) {
 	p_ = rhs.p_;
 	reinterpret_cast<::IRawElementProviderSimple*>(p_)->AddRef();
+	return *this;
 }
 
 RawElementProviderSimple& RawElementProviderSimple::operator=(RawElementProviderSimple&& rhs) {
 	p_ = rhs.p_;
 	rhs.p_ = nullptr;
+	return *this;
 }
 
 RawElementProviderSimple::~RawElementProviderSimple() {
@@ -63,11 +65,11 @@ RawElementProviderSimple::~RawElementProviderSimple() {
 	}
 }
 
-Uiaw::Result<Uiaw::ProviderOptions> RawElementProviderSimple::GetProviderOptions() {
+/*Uiaw::Result<Uiaw::ProviderOptions> RawElementProviderSimple::GetProviderOptions() {
 	::ProviderOptions result{};
 	HRESULT hr = reinterpret_cast<::IRawElementProviderSimple*>(p_)->get_ProviderOptions(&result);
-	return { .value = result, .error = ErrorCode {static_cast<int32_t>(hr)} };
-}
+	return { .value = uiaw::ToUiaw(result), .error = ErrorCode {static_cast<int32_t>(hr)} };
+}*/
 
 } // namespace Uiaw
 
