@@ -7,7 +7,10 @@
 #include <cstdint>
 
 namespace Uiaw {
-
+enum class FailMode {
+	Silent,
+	Terminate,
+};
 
 struct ErrorCode {
 	int32_t value{};
