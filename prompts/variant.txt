@@ -1,4 +1,13 @@
-Below is the definition of the VARIANT type from oaidl.h.  I want you to create a class using modern-C++ that accomplishes the same thing as VARIANT (do not use std::variant - roll the type yourself with a union).  Ideally, the class should have the same memory layout and field semantics as VARIANT so that i can  convert between the two with memcpy.  Also below find the enum VARENUM, which i think acts as the tag for VARIANT?  I'm not sure.  Create a modern enum class out of it in line with what we have pbeen doing previously.
+I am trying to create a wrapper for the VARIANT type defined in oaidl.h.  Below is its definition.  I want you to create a class using modern-C++ that wraps this *by value*, without exposing any users of the class to any windows headers or types.  It will obviously need to provide methods to get the different types of values out of it, but, because we want to avoid exposing users to any windows types/typedefs like (capital) DOUBLE or FLOAT, the getter for DOUBLE will need to return a double and static_assert internally that DOUBLE is equivalent to double.  For more complicated types like IDispatch or IUnknown, just stick to returning those types; i'll implement wrappers for those later and update your work.
+
+The class should have all the typical special member functions, like copy and move constructors and assignment oeprators.
+
+Since we are going to avoid exposing users of my class to any windows headers, and sincew we are going to hold the variant by vlaue, i think you are probably have to have the class hold a std::array<std::byte> sized correctly to hold a VARIANT (static_assert in the cpp file that the size is adequate) and then use placement new to construct the VARIANT?
+
+Here is the official documentation for VARIANT: https://learn.microsoft.com/en-us/windows/win32/api/oaidl/ns-oaidl-variant
+
+Note also that there are some otehr types like VARFLAGS, VARTYPE, and VARENUM for which you may need to also create modern analogs for use in the wrapper interface (and translated in the cpp file back and forth between the corresponding Win32 type)
+
 
 
 typedef /* [wire_marshal] */ struct tagVARIANT VARIANT;
@@ -72,6 +81,13 @@ struct tagVARIANT
     } ;
 	
 	
+
+
+
+
+
+
+
 enum VARENUM
     {
         VT_EMPTY	= 0,

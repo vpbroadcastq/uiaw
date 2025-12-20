@@ -4,7 +4,8 @@ add_library(uiaw STATIC
 	UIAutomation.cpp
 	UIAutomationElement.cpp 
 	UIAutomationCondition.cpp 
-	UIAutomationTreeWalker.cpp)
+	UIAutomationTreeWalker.cpp
+	variant.cpp)
 
 
 target_include_directories(uiaw PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
