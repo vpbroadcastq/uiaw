@@ -1,6 +1,7 @@
 #include "UIAutomation.h"
 #include "uia_all.h"
-
+#include "utility.h"
+#include <exception>
 
 namespace Uiaw {
 
@@ -27,11 +28,11 @@ UIAutomation::UIAutomation() {
 }
 UIAutomation::UIAutomation(const UIAutomation& rhs) {
 	p_ = rhs.p_;
-	reinterpret_cast<IUIAutomation*>(p_)->AddRef();
+	reinterpret_cast<::IUIAutomation*>(p_)->AddRef();
 }
 UIAutomation& UIAutomation::operator=(const UIAutomation& rhs) {
 	p_ = rhs.p_;
-	reinterpret_cast<IUIAutomation*>(p_)->AddRef();
+	reinterpret_cast<::IUIAutomation*>(p_)->AddRef();
 	return *this;
 }
 UIAutomation::UIAutomation(UIAutomation&& rhs) {
@@ -45,17 +46,17 @@ UIAutomation& UIAutomation::operator=(UIAutomation&& rhs) {
 }
 UIAutomation::~UIAutomation() {
 	if (p_) {
-		reinterpret_cast<IUIAutomation*>(p_)->Release();
+		reinterpret_cast<::IUIAutomation*>(p_)->Release();
 	}
 }
 
 Uiaw::Result<Uiaw::UIAutomationElement> UIAutomation::GetRootElement() {
 	::IUIAutomationElement* elem {nullptr};
-	HRESULT hr = reinterpret_cast<IUIAutomation*>(p_)->GetRootElement(&elem);
+	HRESULT hr = reinterpret_cast<::IUIAutomation*>(p_)->GetRootElement(&elem);
 	if (FAILED(hr)) {
-		return Uiaw::Result<Uiaw::UIAutomation>{.error = Uiaw::ErrorCode{ static_cast<int32_t>(hr) }};
+		return Uiaw::Result<Uiaw::UIAutomationElement>{.error = Uiaw::ErrorCode{ static_cast<int32_t>(hr) }};
 	}
-	return Uiaw::Result<Uiaw::UIAutomation>{.value = Uiaw::UIAutomationElement{ elem }};
+	return Uiaw::Result<Uiaw::UIAutomationElement>{.value = Uiaw::UIAutomationElement(elem)};
 }
 
 

@@ -11,12 +11,12 @@ UIAutomationCondition::UIAutomationCondition(void* p) {
 
 UIAutomationCondition::UIAutomationCondition(const UIAutomationCondition& rhs) {
 	p_ = rhs.p_;
-	reinterpret_cast<IUIAutomationCondition*>(p_)->AddRef();
+	reinterpret_cast<::IUIAutomationCondition*>(p_)->AddRef();
 }
 
 UIAutomationCondition& UIAutomationCondition::operator=(const UIAutomationCondition& rhs) {
 	p_ = rhs.p_;
-	reinterpret_cast<IUIAutomationCondition*>(p_)->AddRef();
+	reinterpret_cast<::IUIAutomationCondition*>(p_)->AddRef();
 	return *this;
 }
 
@@ -33,7 +33,7 @@ UIAutomationCondition& UIAutomationCondition::operator=(UIAutomationCondition&& 
 
 UIAutomationCondition::~UIAutomationCondition() {
 	if (p_) {
-		reinterpret_cast<IUIAutomationCondition*>(p_)->Release();
+		reinterpret_cast<::IUIAutomationCondition*>(p_)->Release();
 	}
 }
 

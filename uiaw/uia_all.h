@@ -6,7 +6,8 @@
 #include "UIAutomation.h"
 #include "UIAutomationClient.h"
 #include "uiautomationcoreapi.h"
-#include "oleacc.h"
+#include <oleacc.h>
+#include <oleauto.h>
 #include <comdef.h>
 #include <windows.h>
 #include <combaseapi.h>
