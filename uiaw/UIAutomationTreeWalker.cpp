@@ -42,10 +42,11 @@ Uiaw::Result<Uiaw::UIAutomationElement> UIAutomationTreeWalker::GetFirstChildEle
 	HRESULT hr = reinterpret_cast<IUIAutomationTreeWalker*>(p_)->GetFirstChildElement(
 		reinterpret_cast<::IUIAutomationElement*>(element->p_),
 		&child);
+
 	if (FAILED(hr)) {
-		return Uiaw::Result<Uiaw::UIAutomationElement>{ .error = Uiaw::ErrorCode{ static_cast<int32_t>(hr) } };
+		return Uiaw::Result<Uiaw::UIAutomationElement>(Uiaw::ErrorCode{static_cast<int32_t>(hr)});
 	}
-	return Uiaw::Result<Uiaw::UIAutomationElement>{ .value = Uiaw::UIAutomationElement{ child } };
+	return Uiaw::Result<Uiaw::UIAutomationElement>(Uiaw::UIAutomationElement{child});
 }
 
 Uiaw::Result<Uiaw::UIAutomationElement> UIAutomationTreeWalker::GetNextSiblingElement(Uiaw::UIAutomationElement* element) {
@@ -54,9 +55,9 @@ Uiaw::Result<Uiaw::UIAutomationElement> UIAutomationTreeWalker::GetNextSiblingEl
 		reinterpret_cast<::IUIAutomationElement*>(element->p_),
 		&sibling);
 	if (FAILED(hr)) {
-		return Uiaw::Result<Uiaw::UIAutomationElement>{ .error = Uiaw::ErrorCode{ static_cast<int32_t>(hr) } };
+		return Uiaw::Result<Uiaw::UIAutomationElement>(Uiaw::ErrorCode{ static_cast<int32_t>(hr) });
 	}
-	return Uiaw::Result<Uiaw::UIAutomationElement>{ .value = Uiaw::UIAutomationElement{ sibling } };
+	return Uiaw::Result<Uiaw::UIAutomationElement>(Uiaw::UIAutomationElement{sibling});
 }
 
 

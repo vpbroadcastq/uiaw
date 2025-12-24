@@ -9,9 +9,9 @@ Uiaw::Result<Uiaw::UIAutomation> UIAutomation::Create() {
 	::IUIAutomation* p {nullptr};
 	HRESULT hr = CoCreateInstance(CLSID_CUIAutomation, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&p));
 	if (FAILED(hr)) {
-		return Uiaw::Result<Uiaw::UIAutomation>{.error = Uiaw::ErrorCode{ static_cast<int32_t>(hr) }};
+		return Uiaw::Result<Uiaw::UIAutomation>(Uiaw::ErrorCode{static_cast<int32_t>(hr)});
 	}
-	return Uiaw::Result<Uiaw::UIAutomation>{.value = Uiaw::UIAutomation{ p }};
+	return Uiaw::Result<Uiaw::UIAutomation>(Uiaw::UIAutomation{p});
 }
 
 UIAutomation::UIAutomation(void* p) {
@@ -54,15 +54,10 @@ Uiaw::Result<Uiaw::UIAutomationElement> UIAutomation::GetRootElement() {
 	::IUIAutomationElement* elem {nullptr};
 	HRESULT hr = reinterpret_cast<::IUIAutomation*>(p_)->GetRootElement(&elem);
 	if (FAILED(hr)) {
-		return Uiaw::Result<Uiaw::UIAutomationElement>{.error = Uiaw::ErrorCode{ static_cast<int32_t>(hr) }};
+		return Uiaw::Result<Uiaw::UIAutomationElement>(Uiaw::ErrorCode{static_cast<int32_t>(hr)});
 	}
-	return Uiaw::Result<Uiaw::UIAutomationElement>{.value = Uiaw::UIAutomationElement(elem)};
+	return Uiaw::Result<Uiaw::UIAutomationElement>(Uiaw::UIAutomationElement(elem));
 }
-
-
-
-
-
 
 
 

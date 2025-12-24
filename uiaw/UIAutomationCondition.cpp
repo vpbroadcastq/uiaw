@@ -1,6 +1,6 @@
 #include "UIAutomationCondition.h"
 #include "uia_all.h"
-#include "uiaw.h"
+
 
 
 namespace Uiaw {
@@ -37,6 +37,9 @@ UIAutomationCondition::~UIAutomationCondition() {
 	}
 }
 
+void* UIAutomationCondition::GetInternalPointer() {
+	return p_;
+}
 
 
 } // namespace Uiaw

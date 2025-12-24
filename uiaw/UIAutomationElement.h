@@ -1,17 +1,21 @@
 #pragma once
 #include "utility.h"
 #include "enums.h"
-#include "UIAutomationCondition.h"
+
 
 
 
 namespace Uiaw {
-//class InternalAccessor;
+class UIAutomation;
+class UIAutomationTreeWalker;
+class UIAutomationCondition;
 
 class UIAutomationElement {
 	void* p_;
 	explicit UIAutomationElement(void*);
-	friend class InternalAccessor;
+
+	friend class Uiaw::UIAutomation;
+	friend class Uiaw::UIAutomationTreeWalker;
 
 public:
 	UIAutomationElement(const UIAutomationElement&);

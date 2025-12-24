@@ -1,12 +1,12 @@
 #pragma once
-#include "uiaw.h"
-#include "uia_all.h"  // TODO:  DELETE ME
+//#include "uiaw.h"
 #include "UIAutomationElement.h"
 #include "UIAutomationCondition.h"
+#include "UIAutomationTreeWalker.h"
 
 namespace Uiaw {
 
-// Owns an IUIAutomation
+// Owns an ::IUIAutomation
 class UIAutomation {
 	void* p_;
 
@@ -24,7 +24,7 @@ public:
 
     Uiaw::Result<Uiaw::UIAutomationElement> GetRootElement();
 	Uiaw::Result<Uiaw::UIAutomationCondition> CreatePropertyCondition(Uiaw::PropertyId, Uiaw::Variant);
-	//Uiaw::Result<Uiaw::UIAutomationTreeWalker> GetControlViewWalker();
+	Uiaw::Result<Uiaw::UIAutomationTreeWalker> GetControlViewWalker();
 };
 
 

@@ -15,6 +15,7 @@ public:
 	UIAutomationCondition& operator=(UIAutomationCondition&&);
 	~UIAutomationCondition();
 
+	void* GetInternalPointer();
 };
 
 

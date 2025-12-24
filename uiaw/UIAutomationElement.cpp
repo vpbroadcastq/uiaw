@@ -1,4 +1,6 @@
 #include "UIAutomationElement.h"
+
+#include "UIAutomationCondition.h"
 #include "uia_all.h"
 #include "enums_private.h"
 
@@ -40,13 +42,13 @@ Uiaw::Result<Uiaw::UIAutomationElement> UIAutomationElement::FindFirst(Uiaw::Tre
 	::IUIAutomationElement* found {nullptr};
 	HRESULT hr = reinterpret_cast<::IUIAutomationElement*>(p_)->FindFirst(
 		Uiaw::ToUia(scope),
-		reinterpret_cast<::IUIAutomationCondition*>(condition->p_),
+		reinterpret_cast<::IUIAutomationCondition*>(condition->GetInternalPointer()),
 		&found);
 
 	if (FAILED(hr)) {
-		return Uiaw::Result<Uiaw::UIAutomationElement>{.error = Uiaw::ErrorCode{ static_cast<int32_t>(hr) } };
+		return Uiaw::Result<Uiaw::UIAutomationElement>(Uiaw::ErrorCode{static_cast<int32_t>(hr)});
 	}
-	return Uiaw::Result<Uiaw::UIAutomationElement>{.value = Uiaw::UIAutomationElement{ found } };
+	return Uiaw::Result<Uiaw::UIAutomationElement>(Uiaw::UIAutomationElement(found));
 }
 
 
