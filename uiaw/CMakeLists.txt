@@ -5,6 +5,7 @@ add_library(uiaw STATIC
 	UIAutomationElement.cpp 
 	UIAutomationCondition.cpp 
 	UIAutomationTreeWalker.cpp
+	result.cpp
 	variant.cpp)
 
 
